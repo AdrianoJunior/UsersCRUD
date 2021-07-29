@@ -160,16 +160,24 @@ class _AddUserPageState extends State<AddUserPage> {
     );
 
     ApiResponse<Usuario> userResponse = await _bloc.create(user);
+    final provider = Provider.of<UsersProvider>(context, listen: false);
     if (userResponse.ok) {
       user = userResponse.result;
 
-      final provider = Provider.of<UsersProvider>(context, listen: false);
+
       provider.addUser(user).then((value) {
         alert(context, "Usuário criado com sucesso!", callback: () {
           pop(context);
         });
       });
     } else {
+      if(userResponse.msg == 'Já existe um usuário cadastrado com este e-mail.') {
+        provider.addUser(user).then((value) {
+          alert(context, "Usuário cadasttrado comm sucesso.", callback: (){
+            pop(context);
+          });
+        });
+      }
       alert(context, userResponse.msg);
     }
   }
