@@ -1,7 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:users_crud/api_response.dart';
+import 'package:users_crud/firebase/firebase_api.dart';
+import 'package:users_crud/pages/users/add_user_page.dart';
 import 'package:users_crud/pages/users/users_page.dart';
+import 'package:users_crud/pages/users/usuario.dart';
+import 'package:users_crud/provider/users_provider.dart';
 import 'package:users_crud/utils/alert.dart';
 import 'package:users_crud/utils/nav.dart';
 import 'package:users_crud/widgets/button_widget.dart';
@@ -26,6 +31,8 @@ class _CadastroPageState extends State<CadastroPage> {
   final _formKey = GlobalKey<FormState>();
 
   final _bloc = LoginBloc();
+
+  String dataNascimentoString;
 
   bool _showProgress = false;
 
@@ -100,10 +107,9 @@ class _CadastroPageState extends State<CadastroPage> {
                         color: Colors.white,
                       ),
                       padding: EdgeInsets.only(left: 10),
-
                       child: DateTimePicker(
                         type: DateTimePickerType.date,
-                        firstDate: DateTime(2000),
+                        firstDate: DateTime(1900),
                         lastDate: DateTime(2100),
                         focusNode: _focusData,
                         dateLabelText: 'Data de nascimento',
@@ -112,15 +118,21 @@ class _CadastroPageState extends State<CadastroPage> {
                           hintText: 'Data de nascimento',
                           prefixIcon: Icon(Icons.calendar_today_rounded),
                         ),
-                        onChanged: (val) => print(val),
+                        onChanged: (val) {
+                          print(val);
+                          dataNascimentoString = val;
+                        },
                         validator: (val) {
                           print(val);
+                          dataNascimentoString = val;
                           return null;
                         },
-                        onSaved: (val) => print(val),
+                        onSaved: (val) {
+                          print(val);
+                          dataNascimentoString = val;
+                        },
                         dateMask: 'dd/MM/yyyy',
                         cancelText: 'Cancelar',
-
                       ),
                     ),
                     Expanded(
@@ -167,25 +179,40 @@ class _CadastroPageState extends State<CadastroPage> {
       return;
     }
 
-    String login = _tLogin.text;
+    String email = _tLogin.text;
     String senha = _tSenha.text;
     String nome = _tNome.text;
+    DateTime dataNascimento = DateTime.parse(dataNascimentoString);
+    Usuario user = Usuario(
+      email: email,
+      nome: nome,
+      senha: senha,
+      dataNascimento: Timestamp.fromDate(dataNascimento),
+    );
 
-    ApiResponse response = await _bloc.create(login, senha, nome);
-    if (response.ok) {
-      alert(context, "Conta criada com sucesso", callback: () async {
-        ApiResponse loginResponse = await _bloc.login(login, senha);
-        if (loginResponse.ok) {
+    ApiResponse createResponse = await _bloc.create(user);
+    if (createResponse.ok) {
+      ApiResponse loginResponse = await _bloc.login(user);
+      if (loginResponse.ok) {
+        String docResponse = await FirebaseApi.createUser(user);
+
+        if(docResponse != null && docResponse.isNotEmpty) {
+          Usuario().save();
           push(context, UsersPage(), replace: true);
         } else {
-          alert(context, "Não foi possível realizar o login, tente novamente",
-              callback: () {
-            pop(context);
+          alert(context, "Não foi possível salvar os dados do usuário, tente novamente!", callback: () async {
+
           });
         }
-      });
+      } else {
+        alert(context,
+            "Não foi possível fazer login, volte para a tela de login e tente novamente!",
+            callback: () {
+          push(context, LoginPage(), replace: true);
+        });
+      }
     } else {
-      alert(context, response.msg);
+      alert(context, "Não foi possível criar sua conta, tente novamente");
     }
   }
 
@@ -203,12 +230,6 @@ class _CadastroPageState extends State<CadastroPage> {
     return null;
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-
-    _bloc.dispose();
-  }
 
   String _validateNome(String text) {
     if (text.isEmpty) {

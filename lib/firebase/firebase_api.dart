@@ -1,34 +1,35 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:users_crud/api_response.dart';
+import 'package:users_crud/pages/users/usuario.dart';
+import 'package:users_crud/utils/utils.dart';
 
 class FirebaseApi {
-  /*static Future<String> createTodo(Todo todo, String uid) async {
-    final docTodo =
-        FirebaseFirestore.instance.collection('users/$uid/todos').doc();
+  static Future<String> createUser(Usuario usuario) async {
+    final docUser = FirebaseFirestore.instance.collection('users').doc();
 
-    todo.id = docTodo.id;
+    usuario.id = docUser.id;
 
-    await docTodo.set(todo.toMap());
+    await docUser.set(usuario.toMap());
 
-    return docTodo.id;
+    return docUser.id;
   }
 
-  static Stream<List<Todo>> readTodos(String uid) => FirebaseFirestore.instance
-      .collection('users/$uid/todos')
-      .orderBy(TodoField.createdTime, descending: true)
+  static Stream<List<Usuario>> readUsers() => FirebaseFirestore.instance
+      .collection('users')
+      .orderBy('nome', descending: false)
       .snapshots()
-      .transform(Utils.transformer(Todo.fromMap));
+      .transform(Utils.transformer(Usuario.fromMap));
 
-  static Future updateTodo(Todo todo, String uid) async {
-    final docTodo =
-        FirebaseFirestore.instance.collection('users/$uid/todos').doc(todo.id);
+  static Future<ApiResponse> updateUser(Usuario usuario) async {
+    final docUser =
+        FirebaseFirestore.instance.collection('users').doc(usuario.id);
 
-    await docTodo.update(todo.toMap());
+    await docUser.update(usuario.toMap());
   }
 
-  static Future deleteTodo(Todo todo, String uid) async {
-    final docTodo =
-        FirebaseFirestore.instance.collection('users/$uid/todos').doc(todo.id);
-
-    await docTodo.delete();
-  }*/
+  static Future deleteUser(Usuario usuario) async {
+    final docUser =
+        FirebaseFirestore.instance.collection('users').doc(usuario.id);
+    await docUser.delete();
+  }
 }

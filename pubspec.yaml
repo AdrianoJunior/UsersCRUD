@@ -35,6 +35,8 @@ dependencies:
   animations: ^2.0.1
   intl: ^0.17.0
   date_time_picker: ^2.1.0
+  sqflite: ^2.0.0+3
+  provider: ^5.0.0
 
   # FIREBASE
   firebase_core: ^1.4.0

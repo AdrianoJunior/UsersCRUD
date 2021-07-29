@@ -6,11 +6,11 @@ import 'package:users_crud/pages/users/usuario.dart';
 class FirebaseService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Future<ApiResponse<User>> login(String email, String senha) async {
+  Future<ApiResponse<User>> login(Usuario usuario) async {
     try {
       // Usuario do Firebase
-      final authResult =
-          await _auth.signInWithEmailAndPassword(email: email, password: senha);
+      final authResult = await _auth.signInWithEmailAndPassword(
+          email: usuario.email, password: usuario.senha);
       final User fUser = authResult.user;
       print("signed in ${authResult.user.displayName}");
 
@@ -18,6 +18,9 @@ class FirebaseService {
       final user = Usuario(
         nome: fUser.displayName,
         email: fUser.email,
+        senha: usuario.senha,
+        dataNascimento: usuario.dataNascimento,
+        uid: fUser.uid,
       );
       user.save();
 
@@ -37,34 +40,28 @@ class FirebaseService {
     }
   }
 
-  Future<ApiResponse<User>> create(
-      String email, String senha, String nome) async {
+  Future<ApiResponse<Usuario>> create(Usuario usuario) async {
     try {
       // Usuario do Firebase
       final authResult = await _auth.createUserWithEmailAndPassword(
-          email: email, password: senha);
+          email: usuario.email, password: usuario.senha);
       final User fUser = authResult.user;
       print("created user ${authResult.user.displayName}");
 
-      fUser.updateProfile(displayName: nome);
+      fUser.updateDisplayName(usuario.nome);
 
       // Cria um usuario do app
       final user = Usuario(
-        nome: fUser.displayName,
+        nome: usuario.nome,
         email: fUser.email,
+        senha: usuario.senha,
+        dataNascimento: usuario.dataNascimento,
+        uid: fUser.uid,
       );
-      user.save();
-
-      FirebaseFirestore.instance
-          .collection('users')
-          .doc(fUser.uid)
-          .set(user.toMap());
-
-      // Resposta genérica
+      // user.save();
 
       if (user != null) {
-        return ApiResponse.ok(
-            /*result: true, msg: "Login efetuado com sucesso"*/);
+        return ApiResponse.ok(result: user);
       } else {
         return ApiResponse.error(
             msg: "Não foi possível criar sua conta, tente novamente!");
@@ -79,18 +76,5 @@ class FirebaseService {
   Future<void> logout() async {
     await _auth.signOut();
     Usuario.clear();
-  }
-
-  static Future<ApiResponse<bool>> saveUserData(
-      Map<String, dynamic> mapUser, String uid) async {
-    try {
-      final firestore = FirebaseFirestore.instance;
-      await firestore.collection('users').doc(uid).set(mapUser);
-      return ApiResponse.ok();
-    } catch (e) {
-      print("ERRO FIRESTORE SAVE >>>>> $e");
-
-      return ApiResponse.error();
-    }
   }
 }

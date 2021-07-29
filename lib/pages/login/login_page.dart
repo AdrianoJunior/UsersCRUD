@@ -3,6 +3,7 @@ import 'package:users_crud/api_response.dart';
 import 'package:users_crud/pages/login/cadastro_page.dart';
 import 'package:users_crud/pages/login/login_bloc.dart';
 import 'package:users_crud/pages/users/users_page.dart';
+import 'package:users_crud/pages/users/usuario.dart';
 import 'package:users_crud/utils/alert.dart';
 import 'package:users_crud/utils/nav.dart';
 import 'package:users_crud/widgets/button_widget.dart';
@@ -30,12 +31,8 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-        /*appBar: AppBar(
-            title: Text("Login"),
-          centerTitle: true,
-        ),*/
-        body: _body(),
-     );
+      body: _body(),
+    );
   }
 
   _body() {
@@ -66,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
                       hint: "Senha",
                       icon: Icons.vpn_key,
                       controller: _tSenha,
-                      validator:(s) => _validateSenha(s),
+                      validator: (s) => _validateSenha(s),
                       keyboardType: TextInputType.text,
                       focusNode: _focusSenha,
                       inputAction: TextInputAction.done,
@@ -128,25 +125,28 @@ class _LoginPageState extends State<LoginPage> {
     String login = _tLogin.text;
     String senha = _tSenha.text;
 
-    ApiResponse response = await _bloc.login(login, senha);
-    if (response.ok) {
+    ApiResponse userResponse =
+        await _bloc.login(Usuario(email: login, senha: senha));
+    print("\n\n\nRESULT >>>>>>> ${userResponse.ok}\n\n\n");
+
+    if (userResponse.result == true) {
       push(context, UsersPage(), replace: true);
     } else {
-      alert(context, response.msg);
+      alert(context, userResponse.msg);
     }
   }
 
   String _validateSenha(String text) {
-    if(text.isEmpty) {
+    if (text.isEmpty) {
       return "Por favor, digite a senha";
-    } else if(text.length < 6) {
+    } else if (text.length < 6) {
       return "A senha deve conter ao menos 6 caracteres";
     }
     return null;
   }
 
   String _validateLogin(String text) {
-    if(text.isEmpty) {
+    if (text.isEmpty) {
       return "Por favor, digite seu e-mail";
     }
     return null;

@@ -2,31 +2,30 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:users_crud/pages/users/edit_user_page.dart';
 import 'package:users_crud/pages/users/usuario.dart';
+import 'package:users_crud/provider/users_provider.dart';
 import 'package:users_crud/utils/alert.dart';
+import 'package:users_crud/utils/nav.dart';
+import 'package:users_crud/utils/utils.dart';
 
-class UsersListView extends StatefulWidget {
+class UsersListView extends StatelessWidget {
   List<Usuario> users;
 
   UsersListView({@required this.users});
 
-  @override
-  _UsersListViewState createState() => _UsersListViewState();
-}
-
-class _UsersListViewState extends State<UsersListView> {
   @override
   Widget build(BuildContext context) {
     return Container(
       child: ListView.builder(
         physics: BouncingScrollPhysics(),
         padding: EdgeInsets.all(16),
-        itemCount: widget.users != null ? widget.users.length : 0,
+        itemCount: users != null ? users.length : 0,
         itemBuilder: (context, index) {
-          Usuario user = widget.users[index];
+          Usuario user = users[index];
 
-          String dataNascimentoUser =
-              DateFormat("dd/MM/yyyy").format(user.dataNascimento);
+          DateTime dataNascimento = DateTime.fromMillisecondsSinceEpoch(user.dataNascimento.millisecondsSinceEpoch);
 
           return ClipRRect(
             borderRadius: BorderRadius.circular(16),
@@ -35,7 +34,9 @@ class _UsersListViewState extends State<UsersListView> {
               actions: [
                 IconSlideAction(
                   color: Colors.green,
-                  onTap: () {},
+                  onTap: () {
+                    push(context, EditUserPage(usuario: user));
+                  },
                   caption: 'Editar',
                   icon: Icons.edit,
                 ),
@@ -50,9 +51,7 @@ class _UsersListViewState extends State<UsersListView> {
                       "Deseja excluir o usuário: ${user.nome}?"
                       "\nA ação não pode ser desfeita",
                       callback: () {
-                        setState(() {
-                          widget.users.remove(user);
-                        });
+                        deleteUser(context, user);
                       },
                     );
                   },
@@ -66,7 +65,12 @@ class _UsersListViewState extends State<UsersListView> {
                 child: Container(
                   padding: EdgeInsets.all(10),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 16),
+                        child: Image.asset('assets/images/default_image.png', width: 50,),
+                      ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
@@ -79,8 +83,10 @@ class _UsersListViewState extends State<UsersListView> {
                             ),
                           ),
                           Text(
-                            dataNascimentoUser ??
-                                "Data de nascimento do usuário",
+                            dataNascimento != null
+                                ? DateFormat('dd/MM/yyyy')
+                                    .format(dataNascimento)
+                                : "Data de nascimento do usuário",
                             style: TextStyle(
                               fontSize: 16,
                             ),
@@ -104,5 +110,10 @@ class _UsersListViewState extends State<UsersListView> {
     );
   }
 
-  _onClickUser(BuildContext context, Usuario user) {}
+  void deleteUser(BuildContext context, Usuario user) {
+    final provider = Provider.of<UsersProvider>(context, listen: false);
+    provider.removeUser(user);
+
+    Utils.showSnackBar(context, 'O usuário ${user.nome} foi excluido com sucesso.');
+  }
 }

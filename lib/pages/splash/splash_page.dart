@@ -16,21 +16,24 @@ class _SplashPageState extends State<SplashPage> {
   void initState() {
     super.initState();
 
-    Future.delayed(Duration(seconds: 3)).then((value) {
-      Usuario.get().then((user) {
-        if (user != null) {
-          push(context, UsersPage(), replace: true);
-        } else {
-          push(context, LoginPage(), replace: true);
-        }
-      });
+    Future futureDelay = Future.delayed(Duration(seconds: 3));
+
+    Future futureUser = Usuario.get();
+
+    Future.wait([futureDelay, futureUser]).then((List values) {
+      Usuario user = values[1];
+
+      if (user != null) {
+        push(context, UsersPage(), replace: true);
+      } else {
+        push(context, LoginPage(), replace: true);
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(),
       body: _body(),
     );
   }
@@ -43,7 +46,7 @@ class _SplashPageState extends State<SplashPage> {
         children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Image.asset('assets/images/splash_image.png'),
+            child: Image.asset('assets/images/crud_logo.png'),
           ),
           // SizedBox(height: 32),
           CircularProgressIndicator(),
