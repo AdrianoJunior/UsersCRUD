@@ -28,7 +28,7 @@ class FirebaseService {
 
       if (user != null) {
         return ApiResponse.ok(
-            /*result: true, msg: "Login efetuado com sucesso"*/);
+          /*result: true, msg: "Login efetuado com sucesso"*/);
       } else {
         return ApiResponse.error(
             msg: "Não foi possível fazer o login, tente novamente!");
@@ -68,8 +68,14 @@ class FirebaseService {
       }
     } on FirebaseAuthException catch (e) {
       print(" >>> CODE : ${e.code}\n>>> ERRO : $e");
-      return ApiResponse.error(
-          msg: "Não foi possível criar sua conta, tente novamente!");
+
+      if (e.code == 'email-already-in-use') {
+        return ApiResponse.error(
+            msg: 'Já existe um usuário cadastrado com este e-mail.');
+      } else {
+        return ApiResponse.error(
+            msg: "Não foi possível criar sua conta, tente novamente!");
+      }
     }
   }
 

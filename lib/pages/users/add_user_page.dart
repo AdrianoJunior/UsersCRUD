@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:users_crud/api_response.dart';
 import 'package:users_crud/pages/login/login_bloc.dart';
-import 'package:users_crud/pages/users/users_page.dart';
 import 'package:users_crud/pages/users/usuario.dart';
 import 'package:users_crud/provider/users_provider.dart';
 import 'package:users_crud/utils/alert.dart';
@@ -171,7 +170,7 @@ class _AddUserPageState extends State<AddUserPage> {
         });
       });
     } else {
-      alert(context, "Não foi possível criar o usuário");
+      alert(context, userResponse.msg);
     }
   }
 
