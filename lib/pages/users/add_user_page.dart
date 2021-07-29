@@ -173,7 +173,7 @@ class _AddUserPageState extends State<AddUserPage> {
     } else {
       if(userResponse.msg == 'Já existe um usuário cadastrado com este e-mail.') {
         provider.addUser(user).then((value) {
-          alert(context, "Usuário cadasttrado comm sucesso.", callback: (){
+          alert(context, "Usuário cadastrado comm sucesso.", callback: (){
             pop(context);
           });
         });
