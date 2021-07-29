@@ -69,13 +69,6 @@ class _LoginPageState extends State<LoginPage> {
                       inputAction: TextInputAction.done,
                       password: true,
                     ),
-                    Container(
-                      margin: EdgeInsets.only(top: 10),
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        "Esqueceu sua senha?",
-                      ),
-                    ),
                     Expanded(
                       child: Center(
                         child: StreamBuilder<bool>(
@@ -129,7 +122,7 @@ class _LoginPageState extends State<LoginPage> {
         await _bloc.login(Usuario(email: login, senha: senha));
     print("\n\n\nRESULT >>>>>>> ${userResponse.ok}\n\n\n");
 
-    if (userResponse.result == true) {
+    if (userResponse.ok) {
       push(context, UsersPage(), replace: true);
     } else {
       alert(context, userResponse.msg);

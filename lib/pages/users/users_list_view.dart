@@ -25,81 +25,88 @@ class UsersListView extends StatelessWidget {
         itemBuilder: (context, index) {
           Usuario user = users[index];
 
-          DateTime dataNascimento = DateTime.fromMillisecondsSinceEpoch(user.dataNascimento.millisecondsSinceEpoch);
+          DateTime dataNascimento = DateTime.fromMillisecondsSinceEpoch(
+              user.dataNascimento.millisecondsSinceEpoch);
 
-          return ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: Slidable(
-              actionPane: SlidableDrawerActionPane(),
-              actions: [
-                IconSlideAction(
-                  color: Colors.green,
-                  onTap: () {
-                    push(context, EditUserPage(usuario: user));
-                  },
-                  caption: 'Editar',
-                  icon: Icons.edit,
-                ),
-              ],
-              secondaryActions: [
-                IconSlideAction(
-                  color: Colors.red,
-                  caption: 'Excluir',
-                  onTap: () {
-                    alertCancel(
-                      context,
-                      "Deseja excluir o usuário: ${user.nome}?"
-                      "\nA ação não pode ser desfeita",
-                      callback: () {
-                        deleteUser(context, user);
-                      },
-                    );
-                  },
-                  icon: Icons.delete,
-                ),
-              ],
-              child: Card(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16)),
-                color: Colors.grey[100],
-                child: Container(
-                  padding: EdgeInsets.all(10),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(right: 16),
-                        child: Image.asset('assets/images/default_image.png', width: 50,),
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            user.nome ?? "Nome do usuário",
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 25,
-                            ),
+          return InkWell(
+            onTap: () => _onClickUser(context),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Slidable(
+                actionPane: SlidableDrawerActionPane(),
+                actions: [
+                  IconSlideAction(
+                    color: Colors.green,
+                    onTap: () {
+                      push(context, EditUserPage(usuario: user));
+                    },
+                    caption: 'Editar',
+                    icon: Icons.edit,
+                  ),
+                ],
+                secondaryActions: [
+                  IconSlideAction(
+                    color: Colors.red,
+                    caption: 'Excluir',
+                    onTap: () {
+                      alertCancel(
+                        context,
+                        "Deseja excluir o usuário: ${user.nome}?"
+                        "\nA ação não pode ser desfeita",
+                        callback: () {
+                          deleteUser(context, user);
+                        },
+                      );
+                    },
+                    icon: Icons.delete,
+                  ),
+                ],
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
+                  color: Colors.grey[100],
+                  child: Container(
+                    padding: EdgeInsets.all(10),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: 16),
+                          child: Image.asset(
+                            'assets/images/default_image.png',
+                            width: 50,
                           ),
-                          Text(
-                            dataNascimento != null
-                                ? DateFormat('dd/MM/yyyy')
-                                    .format(dataNascimento)
-                                : "Data de nascimento do usuário",
-                            style: TextStyle(
-                              fontSize: 16,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              user.nome ?? "Nome do usuário",
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 25,
+                              ),
                             ),
-                          ),
-                          Text(
-                            user.email ?? "E-mail do usuário",
-                            style: TextStyle(
-                              fontSize: 16,
+                            Text(
+                              dataNascimento != null
+                                  ? DateFormat('dd/MM/yyyy')
+                                      .format(dataNascimento)
+                                  : "Data de nascimento do usuário",
+                              style: TextStyle(
+                                fontSize: 16,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                            Text(
+                              user.email ?? "E-mail do usuário",
+                              style: TextStyle(
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -114,6 +121,12 @@ class UsersListView extends StatelessWidget {
     final provider = Provider.of<UsersProvider>(context, listen: false);
     provider.removeUser(user);
 
-    Utils.showSnackBar(context, 'O usuário ${user.nome} foi excluido com sucesso.');
+    Utils.showSnackBar(
+        context, 'O usuário ${user.nome} foi excluido com sucesso.');
+  }
+
+  void _onClickUser(BuildContext context) {
+    alert(context,
+        "Para excluir um usuário deslize o card para a esquerda.\nPara editar, deslize para a direita.");
   }
 }

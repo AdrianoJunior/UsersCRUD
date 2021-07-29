@@ -61,14 +61,13 @@ class _UsersPageState extends State<UsersPage> {
                     color: Colors.red);
               } else if (!snapshot.hasData) {
                 return Center(child: CircularProgressIndicator());
-              } else {
-                final users = snapshot.data;
-
-                final provider = Provider.of<UsersProvider>(context);
-                provider.setUsers(users);
-
-                return UsersListView(users: users);
               }
+              final users = snapshot.data ?? [];
+
+              final provider = Provider.of<UsersProvider>(context);
+              provider.setUsers(users);
+
+              return UsersListView(users: users);
           }
         });
   }
